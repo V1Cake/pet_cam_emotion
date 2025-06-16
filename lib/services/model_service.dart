@@ -2,10 +2,7 @@ import 'dart:typed_data';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:vet_motion_cam/services/udp_sender_service.dart';
-import '../utils/image_utils.dart'; // 用于帧编码
+// 用于帧编码
 
 class ModelService {
   late Interpreter _interpreter;
@@ -30,7 +27,9 @@ class ModelService {
     final image = img.decodeImage(imageBytes)!;
     final input = preprocess(image);
     // 假设模型输入shape为[1,224,224,3]
-    var inputTensor = [List.generate(224, (i) => List.generate(224, (j) => List.filled(3, 0.0)))];
+    var inputTensor = [
+      List.generate(224, (i) => List.generate(224, (j) => List.filled(3, 0.0))),
+    ];
     // 实际这里需要把input按float填充进去
     // ...
     var output = List.filled(1 * 10, 0).reshape([1, 10]); // 假如输出10类

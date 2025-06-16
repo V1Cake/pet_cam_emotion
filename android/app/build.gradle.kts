@@ -9,7 +9,6 @@ android {
     ndkVersion = "27.0.12077973"
     namespace = "com.example.vet_motion_cam"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -25,7 +24,7 @@ android {
         applicationId = "com.example.vet_motion_cam"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -36,10 +35,16 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.9.0")  // 版本号根据你的 tflite_flutter 版本调整
 }

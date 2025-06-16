@@ -2,7 +2,6 @@ import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as img;
-import 'dart:typed_data';
 
 Future<void> processVideoFrame(Uint8List frame) async {
   await Isolate.run(() {
@@ -61,7 +60,7 @@ img.Image yuv420ToImage(CameraImage image) {
       g = g.clamp(0, 255);
       b = b.clamp(0, 255);
 
-      rgbImage.setPixel(x, y, img.getColor(r, g, b));
+      rgbImage.setPixel(x, y, rgbImage.getColor(r, g, b));
     }
   }
   return rgbImage;

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vet_motion_cam/widgets/overlay/overlay_painter.dart';
 import 'overlay_renderer.dart';
 
 class BoundingBox {

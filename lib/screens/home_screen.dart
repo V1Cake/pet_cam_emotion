@@ -7,11 +7,23 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-          child: Text('Turn on the camera'),
-          onPressed: () {
-            Navigator.pushNamed(context, '/camera');
-          },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              child: Text('Turn on the camera'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/camera');
+              },
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              child: Text('Video Demo Testing'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/video_demo');
+              },
+            ),
+          ],
         ),
       ),
     );
