@@ -49,7 +49,6 @@ List<BoundingBox> generateBoundingBoxes(
     return BoundingBox(rect: rect, label: label, color: color);
   }).toList();
 }
-// ================== 新增结束 ==================
 
 class _CameraScreenState extends State<CameraScreen> {
   late CameraService cameraService;

@@ -76,6 +76,15 @@ class VideoOverlayPainter extends CustomPainter {
 
     final Map<String, Offset> parsedPoints = {};
 
+    // 计算缩放比例，保持原始比例，居中显示
+    double scale = min(renderWidth / videoWidth, renderHeight / videoHeight);
+    double displayVideoWidth = videoWidth * scale;
+    double displayVideoHeight = videoHeight * scale;
+
+    // 计算自动居中偏移
+    double autoOffsetX = (renderWidth - displayVideoWidth) / 2;
+    double autoOffsetY = (renderHeight - displayVideoHeight) / 2;
+
     for (final name in _keypointNames) {
       final xKey = '${name}_x';
       final yKey = '${name}_y';
@@ -106,10 +115,10 @@ class VideoOverlayPainter extends CustomPainter {
           );
         }
 
-        // Scale to the actual CustomPaint rendering size (which is the screen size)
+        // 点位映射时，叠加手动微调偏移
         parsedPoints[name] = Offset(
-          normalizedX * renderWidth + offsetX, // Apply offsetX
-          normalizedY * renderHeight + offsetY, // Apply offsetY
+          normalizedX * displayVideoWidth + autoOffsetX + this.offsetX,
+          normalizedY * displayVideoHeight + autoOffsetY + this.offsetY,
         );
       }
     }
@@ -117,11 +126,7 @@ class VideoOverlayPainter extends CustomPainter {
     // 保存当前的 canvas 状态
     canvas.save();
 
-    // 移动原点到 CustomPaint 的中心
-    canvas.translate(renderWidth / 2, renderHeight / 2);
-
-    // 移回原点，这样绘制会围绕中心旋转
-    canvas.translate(-renderWidth / 2, -renderHeight / 2);
+    // 不再需要移动原点和旋转，直接绘制
 
     // Draw points
     for (final entry in parsedPoints.entries) {
