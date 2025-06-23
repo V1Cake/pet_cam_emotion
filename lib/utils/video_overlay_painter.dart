@@ -11,6 +11,7 @@ class VideoOverlayPainter extends CustomPainter {
   renderHeight; // Actual rendering height of CustomPaint (screen height)
   final double offsetX; // Manual offset for X coordinate
   final double offsetY; // Manual offset for Y coordinate
+  final double manualScale; // 恢复整体缩放比例
 
   VideoOverlayPainter({
     this.frameData,
@@ -18,8 +19,9 @@ class VideoOverlayPainter extends CustomPainter {
     required this.videoHeight,
     required this.renderWidth,
     required this.renderHeight,
-    this.offsetX = -170.0, // Default to 0.0
-    this.offsetY = -130.0, // Default to 0.0
+    this.offsetX = -20.0,
+    this.offsetY = -10.0,
+    this.manualScale = 0.7, // 新增
   });
 
   // Define the ordered list of keypoint names from your CSV 'bodyparts' row
@@ -76,14 +78,9 @@ class VideoOverlayPainter extends CustomPainter {
 
     final Map<String, Offset> parsedPoints = {};
 
-    // 计算缩放比例，保持原始比例，居中显示
-    double scale = min(renderWidth / videoWidth, renderHeight / videoHeight);
-    double displayVideoWidth = videoWidth * scale;
-    double displayVideoHeight = videoHeight * scale;
-
-    // 计算自动居中偏移
-    double autoOffsetX = (renderWidth - displayVideoWidth) / 2;
-    double autoOffsetY = (renderHeight - displayVideoHeight) / 2;
+    // 计算拉伸比例，左上角为基准
+    double scaleX = renderWidth / videoWidth;
+    double scaleY = renderHeight / videoHeight;
 
     for (final name in _keypointNames) {
       final xKey = '${name}_x';
@@ -99,34 +96,14 @@ class VideoOverlayPainter extends CustomPainter {
         double originalCsvX = double.tryParse(xValue.toString()) ?? 0.0;
         double originalCsvY = double.tryParse(yValue.toString()) ?? 0.0;
 
-        double normalizedX, normalizedY;
-
-        // 仅进行归一化，不进行坐标旋转
-        normalizedX = originalCsvX / videoWidth;
-        normalizedY = originalCsvY / videoHeight;
-
-        // Debugging: Print a few keypoint coordinates after normalization
-        if (name == 'Nose' || name == 'Tail_tip') {
-          print(
-            'Painter: $name: originalCsvX: $originalCsvX, originalCsvY: $originalCsvY',
-          );
-          print(
-            'Painter: $name: normalizedX: $normalizedX, normalizedY: $normalizedY',
-          );
-        }
-
-        // 点位映射时，叠加手动微调偏移
-        parsedPoints[name] = Offset(
-          normalizedX * displayVideoWidth + autoOffsetX + this.offsetX,
-          normalizedY * displayVideoHeight + autoOffsetY + this.offsetY,
-        );
+        // 拉伸到全屏后再整体等比例缩放
+        double px = originalCsvX * scaleX * manualScale + offsetX;
+        double py = originalCsvY * scaleY * manualScale + offsetY;
+        parsedPoints[name] = Offset(px, py);
       }
     }
 
-    // 保存当前的 canvas 状态
-    canvas.save();
-
-    // 不再需要移动原点和旋转，直接绘制
+    // 直接绘制，不进行任何变换
 
     // Draw points
     for (final entry in parsedPoints.entries) {
@@ -145,9 +122,6 @@ class VideoOverlayPainter extends CustomPainter {
         canvas.drawLine(startPoint, endPoint, linePaint);
       }
     }
-
-    // 恢复 canvas 状态
-    canvas.restore();
   }
 
   @override
@@ -158,6 +132,8 @@ class VideoOverlayPainter extends CustomPainter {
         oldDelegate.renderWidth != renderWidth ||
         oldDelegate.renderHeight != renderHeight ||
         oldDelegate.offsetX != offsetX || // Include offsetX in repaint check
-        oldDelegate.offsetY != offsetY; // Include offsetY in repaint check
+        oldDelegate.offsetY != offsetY || // Include offsetY in repaint check
+        oldDelegate.manualScale !=
+            manualScale; // Include manualScale in repaint check
   }
 }

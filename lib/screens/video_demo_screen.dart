@@ -22,11 +22,11 @@ class _VideoDemoScreenState extends State<VideoDemoScreen> {
   @override
   void initState() {
     super.initState();
-    // Force landscape mode
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    // 注释掉强制横屏设置，让视频保持原始方向
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.landscapeLeft,
+    //   DeviceOrientation.landscapeRight,
+    // ]);
     _initVideoAndData();
   }
 
@@ -66,11 +66,11 @@ class _VideoDemoScreenState extends State<VideoDemoScreen> {
       _listener!,
     ); // Remove listener to prevent memory leaks
     _controller.dispose();
-    // Reset to portrait mode when leaving the screen
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    // 注释掉恢复竖屏设置，因为已经不再强制横屏
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.portraitUp,
+    //   DeviceOrientation.portraitDown,
+    // ]);
     super.dispose();
   }
 
@@ -83,11 +83,10 @@ class _VideoDemoScreenState extends State<VideoDemoScreen> {
               ? Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Video Player
+                  // Video Player - 全屏拉伸
                   Positioned.fill(
                     child: FittedBox(
-                      fit:
-                          BoxFit.fill, // Ensures video stretches to fill bounds
+                      fit: BoxFit.fill, // 拉伸填满整个屏幕
                       child: SizedBox(
                         width: _controller.value.size.width,
                         height: _controller.value.size.height,
@@ -95,21 +94,15 @@ class _VideoDemoScreenState extends State<VideoDemoScreen> {
                       ),
                     ),
                   ),
-                  // Overlay Painter
+                  // Overlay Painter - 全屏拉伸
                   Positioned.fill(
                     child: CustomPaint(
                       painter: VideoOverlayPainter(
                         frameData: _getCurrentFrameData(),
                         videoWidth: _videoWidth,
                         videoHeight: _videoHeight,
-                        renderWidth:
-                            MediaQuery.of(
-                              context,
-                            ).size.width, // Pass actual screen width
-                        renderHeight:
-                            MediaQuery.of(
-                              context,
-                            ).size.height, // Pass actual screen height
+                        renderWidth: MediaQuery.of(context).size.width,
+                        renderHeight: MediaQuery.of(context).size.height,
                       ),
                     ),
                   ),

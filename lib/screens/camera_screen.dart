@@ -56,17 +56,14 @@ class _CameraScreenState extends State<CameraScreen> {
   bool _initialized = false;
 
   // 用于存储模型推理结果（可替换为实际推理结果）
-  List<Map<String, dynamic>> modelResults = [
-    {'x': 0.1, 'y': 0.2, 'w': 0.3, 'h': 0.2, 'label': 'Corgi', 'score': 0.85},
-    {
-      'x': 0.5,
-      'y': 0.4,
-      'w': 0.2,
-      'h': 0.15,
-      'label': 'Golden Retriever',
-      'score': 0.65,
-    },
-  ];
+  List<Map<String, dynamic>> modelResults = [];
+
+  // 模拟接收联网数据的方法
+  void onReceiveNetworkData(List<Map<String, dynamic>> data) {
+    setState(() {
+      modelResults = data;
+    });
+  }
 
   @override
   void initState() {
@@ -109,27 +106,57 @@ class _CameraScreenState extends State<CameraScreen> {
       );
     }
 
-    // ========== 页面集成：动态生成框 ========== //
     final Size canvasSize = MediaQuery.of(context).size;
-    final List<BoundingBox> detectedBoxes = generateBoundingBoxes(
-      modelResults,
-      canvasSize,
-    );
-    // ========== 页面集成结束 ========== //
+    final List<BoundingBox> detectedBoxes =
+        modelResults.isNotEmpty
+            ? generateBoundingBoxes(modelResults, canvasSize)
+            : [];
 
     return Scaffold(
       appBar: AppBar(title: Text('Camera')),
       body: Stack(
         children: [
           CameraPreview(cameraService.controller!),
-          CustomPaint(
-            painter: OverlayPainter([BoundingBoxRenderer(detectedBoxes)]),
-            child: Container(),
-          ),
+          // 仅在有数据时才绘制框
+          if (detectedBoxes.isNotEmpty)
+            CustomPaint(
+              painter: OverlayPainter([BoundingBoxRenderer(detectedBoxes)]),
+              child: Container(),
+            ),
           Positioned(
             top: 16,
             right: 16,
             child: PerformancePanel(performanceService: performanceService),
+          ),
+          // ====== 模拟按钮：点击后模拟接收数据 ======
+          Positioned(
+            bottom: 32,
+            right: 32,
+            child: FloatingActionButton(
+              onPressed: () {
+                // 模拟收到联网数据
+                onReceiveNetworkData([
+                  {
+                    'x': 0.1,
+                    'y': 0.2,
+                    'w': 0.3,
+                    'h': 0.2,
+                    'label': 'Corgi',
+                    'score': 0.85,
+                  },
+                  {
+                    'x': 0.5,
+                    'y': 0.4,
+                    'w': 0.2,
+                    'h': 0.15,
+                    'label': 'Golden Retriever',
+                    'score': 0.65,
+                  },
+                ]);
+              },
+              child: const Icon(Icons.cloud_download),
+              tooltip: '模拟接收联网数据',
+            ),
           ),
         ],
       ),
